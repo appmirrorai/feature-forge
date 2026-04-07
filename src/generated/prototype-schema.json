@@ -1,0 +1,259 @@
+{
+  "id": "mirror_1774536651150",
+  "name": "demo-ios",
+  "screens": {
+    "HomeView": {
+      "type": "Screen",
+      "children": [
+        {
+          "type": "NavBar",
+          "title": "Home"
+        },
+        {
+          "type": "LargeTitle",
+          "title": "Home"
+        },
+        {
+          "type": "SearchBar",
+          "placeholder": "Search projects..."
+        },
+        {
+          "type": "Section",
+          "header": "Quick Actions",
+          "children": [
+            {
+              "type": "Row",
+              "label": "Create Project",
+              "chevron": true,
+              "navigateTo": "CreateProjectView"
+            },
+            {
+              "type": "Row",
+              "label": "Invite Team Member",
+              "chevron": true,
+              "navigateTo": "InviteView"
+            },
+            {
+              "type": "Row",
+              "label": "View Analytics",
+              "chevron": true,
+              "navigateTo": "AnalyticsView"
+            }
+          ]
+        },
+        {
+          "type": "Section",
+          "header": "Recent Projects",
+          "children": [
+            {
+              "type": "Row",
+              "label": "Mobile App Redesign",
+              "chevron": true,
+              "navigateTo": "ProjectDetailView"
+            },
+            {
+              "type": "Row",
+              "label": "API Gateway v2",
+              "chevron": true,
+              "navigateTo": "ProjectDetailView"
+            },
+            {
+              "type": "Row",
+              "label": "Payment Integration",
+              "chevron": true,
+              "navigateTo": "ProjectDetailView"
+            }
+          ]
+        },
+        {
+          "type": "Section",
+          "header": "Settings",
+          "children": [
+            {
+              "type": "Row",
+              "icon": "👤",
+              "label": "Account",
+              "chevron": true
+            },
+            {
+              "type": "Row",
+              "icon": "🔔",
+              "label": "Notifications",
+              "chevron": true
+            },
+            {
+              "type": "Row",
+              "icon": "⚙️",
+              "label": "Preferences",
+              "chevron": true
+            }
+          ]
+        }
+      ]
+    },
+    "InviteView": {
+      "type": "Screen",
+      "children": [
+        {
+          "type": "NavBar",
+          "title": "Invite"
+        },
+        {
+          "type": "LargeTitle",
+          "title": "Invite"
+        },
+        {
+          "type": "Section",
+          "header": "Invite Details",
+          "children": [
+            {
+              "type": "TextField",
+              "placeholder": "Email address"
+            },
+            {
+              "type": "TextField",
+              "placeholder": "Full name"
+            }
+          ]
+        },
+        {
+          "type": "Section",
+          "header": "Role",
+          "children": [
+            {
+              "type": "Row",
+              "label": "Can edit projects",
+              "toggle": true,
+              "toggleOn": true
+            },
+            {
+              "type": "Row",
+              "label": "Admin access",
+              "toggle": true,
+              "toggleOn": true
+            }
+          ]
+        },
+        {
+          "type": "Section",
+          "header": "Pending Invites",
+          "children": [
+            {
+              "type": "Row",
+              "label": "john@example.com"
+            },
+            {
+              "type": "Row",
+              "label": "sarah@team.co"
+            },
+            {
+              "type": "Row",
+              "label": "mike@company.com"
+            }
+          ]
+        },
+        {
+          "type": "Button",
+          "label": "Send Invite",
+          "style": "filled",
+          "full": true
+        }
+      ]
+    },
+    "ProfileView": {
+      "type": "Screen",
+      "children": [
+        {
+          "type": "NavBar",
+          "title": "Profile"
+        },
+        {
+          "type": "LargeTitle",
+          "title": "Profile"
+        },
+        {
+          "type": "Section",
+          "header": "Account",
+          "children": [
+            {
+              "type": "Row",
+              "icon": "👤",
+              "label": "Edit Profile",
+              "chevron": true
+            },
+            {
+              "type": "Row",
+              "icon": "🔒",
+              "label": "Change Password",
+              "chevron": true
+            },
+            {
+              "type": "Row",
+              "icon": "🛡️",
+              "label": "Two-Factor Auth",
+              "chevron": true
+            }
+          ]
+        },
+        {
+          "type": "Section",
+          "header": "Preferences",
+          "children": [
+            {
+              "type": "Row",
+              "label": "Dark Mode",
+              "toggle": true,
+              "toggleOn": true
+            },
+            {
+              "type": "Row",
+              "label": "Push Notifications",
+              "toggle": true,
+              "toggleOn": true
+            },
+            {
+              "type": "Row",
+              "label": "Email Digest",
+              "toggle": true,
+              "toggleOn": true
+            }
+          ]
+        },
+        {
+          "type": "Section",
+          "header": "Danger Zone",
+          "children": []
+        },
+        {
+          "type": "Button",
+          "label": "Delete Account",
+          "style": "filled",
+          "full": true
+        }
+      ]
+    },
+    "MainTabView": {
+      "type": "Screen",
+      "children": [],
+      "tabBar": {
+        "type": "TabBar",
+        "tabs": [
+          {
+            "icon": "🏠",
+            "label": "Home"
+          },
+          {
+            "icon": "👥",
+            "label": "Team"
+          },
+          {
+            "icon": "👤",
+            "label": "Profile"
+          }
+        ],
+        "activeIndex": 0
+      }
+    }
+  },
+  "entryScreen": "HomeView"
+}

@@ -35,6 +35,14 @@ export default function FeatureList({ features, onSelect, onOrchestrate }: Featu
               <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
               Pipeline connected
             </span>
+            <a
+              href="http://localhost:5175/futuristic.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-primary underline underline-offset-2 hover:opacity-70 transition-opacity"
+            >
+              futuristic
+            </a>
           </div>
         </div>
         <Button variant="primary" onClick={onOrchestrate}>

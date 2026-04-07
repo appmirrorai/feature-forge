@@ -1,10 +1,15 @@
 {
-  "name": "appmirror-tool-starter",
+  "name": "feature-forge",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "preview:standalone": "vite --config vite.preview.ts",
+    "mirror": "node scripts/swift-mirror.mjs",
+    "mirror:watch": "node scripts/swift-mirror.mjs --watch",
+    "screenshots": "node scripts/screenshot-watcher.mjs",
+    "screenshots:watch": "node scripts/screenshot-watcher.mjs --watch",
     "verify:federated-css": "node ./scripts/verify-federated-css.mjs",
     "build": "npm run verify:federated-css && tsc && vite build",
     "typecheck": "tsc --noEmit",
@@ -12,7 +17,10 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
     "@appmirror/ui-kit": "^1.3.7",
+    "@linear/sdk": "^80.0.0",
+    "dotenv": "^17.3.1",
     "express": "^4.21.0"
   },
   "peerDependencies": {

@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>dua.com — AI Pipeline v4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(160deg, #0f0f1a 0%, #1a0f2e 50%, #0f1a2e 100%);
+    color: #f0f0f0;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    touch-action: pan-y;
+  }
+
+  /* ── Background Orbs ── */
+  .bg-orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.35;
+  }
+
+  .orb--purple {
+    width: 500px; height: 500px;
+    background: #8b5cf6;
+    top: -10%; left: -5%;
+    animation: drift-1 25s ease-in-out infinite alternate;
+  }
+
+  .orb--blue {
+    width: 400px; height: 400px;
+    background: #3b82f6;
+    top: 35%; right: -8%;
+    animation: drift-2 22s ease-in-out infinite alternate;
+  }
+
+  .orb--pink {
+    width: 450px; height: 450px;
+    background: #ec4899;
+    bottom: -5%; left: 20%;
+    animation: drift-3 28s ease-in-out infinite alternate;
+  }
+
+  .orb--cyan {
+    width: 350px; height: 350px;
+    background: #06b6d4;
+    bottom: 25%; right: 15%;
+    animation: drift-4 20s ease-in-out infinite alternate;
+  }
+
+  @keyframes drift-1 { to { transform: translate(60px, 40px); } }
+  @keyframes drift-2 { to { transform: translate(-50px, -60px); } }
+  @keyframes drift-3 { to { transform: translate(40px, -50px); } }
+  @keyframes drift-4 { to { transform: translate(-30px, 50px); } }
+
+  /* ── Layout ── */
+  .page { position: relative; z-index: 1; }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  section { padding: 80px 0; }
+
+  /* ── Glass card ── */
+  .glass {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 32px;
+    transition: box-shadow 0.4s ease, border-color 0.4s ease;
+  }
+
+  .glass:hover {
+    border-color: rgba(255,255,255,0.18);
+  }
+
+  /* ── Fade-in on scroll ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── Hero ── */
+  .hero { padding: 120px 0 80px; text-align: center; }
+
+  .hero__eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin-bottom: 24px;
+  }
+
+  .hero__title {
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6, #06b6d4, #ec4899);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-shift 6s ease infinite;
+  }
+
+  @keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .hero__sub {
+    font-size: clamp(16px, 2vw, 20px);
+    color: #9ca3af;
+    max-width: 600px;
+    margin: 0 auto 48px;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  /* ── Agent badges ── */
+  .agent-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.12);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .badge .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .badge--active { box-shadow: 0 0 20px rgba(139,92,246,0.25); }
+  .badge--standby { opacity: 0.5; border-style: dashed; }
+
+  .dot--purple { background: #8b5cf6; }
+  .dot--pink   { background: #ec4899; }
+  .dot--blue   { background: #3b82f6; }
+  .dot--green  { background: #22c55e; }
+  .dot--amber  { background: #f59e0b; }
+  .dot--cyan   { background: #06b6d4; }
+
+  /* ── Pipeline section ── */
+  .pipeline-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .pipeline-header h2 {
+    font-size: clamp(24px, 3.5vw, 36px);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .pipeline-header p {
+    color: #9ca3af;
+    font-size: 15px;
+  }
+
+  /* Vertical connector */
+  .connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 0;
+  }
+
+  .connector__line {
+    width: 2px;
+    height: 40px;
+    border-radius: 2px;
+  }
+
+  .connector__line--purple { background: linear-gradient(to bottom, rgba(139,92,246,0.6), rgba(139,92,246,0.15)); }
+  .connector__line--pink   { background: linear-gradient(to bottom, rgba(236,72,153,0.6), rgba(236,72,153,0.15)); }
+  .connector__line--amber  { background: linear-gradient(to bottom, rgba(245,158,11,0.6), rgba(245,158,11,0.15)); }
+  .connector__line--green  { background: linear-gradient(to bottom, rgba(34,197,94,0.6), rgba(34,197,94,0.15)); }
+
+  /* Pipeline step cards */
+  .step-card {
+    position: relative;
+    margin-bottom: 0;
+  }
+
+  .step-card__header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+
+  .step-card__num {
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .step-card__num--purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+  .step-card__num--pink   { background: linear-gradient(135deg, #ec4899, #db2777); }
+  .step-card__num--amber  { background: linear-gradient(135deg, #f59e0b, #d97706); }
+  .step-card__num--green  { background: linear-gradient(135deg, #22c55e, #16a34a); }
+
+  .step-card__title {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .step-card__desc {
+    color: #9ca3af;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .glow--purple:hover { box-shadow: 0 0 30px rgba(139,92,246,0.25); }
+  .glow--pink:hover   { box-shadow: 0 0 30px rgba(236,72,153,0.25); }
+  .glow--amber:hover  { box-shadow: 0 0 30px rgba(245,158,11,0.25); }
+  .glow--green:hover  { box-shadow: 0 0 30px rgba(34,197,94,0.25); }
+  .glow--cyan:hover   { box-shadow: 0 0 30px rgba(6,182,212,0.25); }
+
+  .border-left--pink   { border-left: 3px solid rgba(236,72,153,0.5); }
+  .border-left--amber  { border-left: 3px solid rgba(245,158,11,0.5); }
+  .border-left--purple { border-left: 3px solid rgba(139,92,246,0.5); }
+  .border-left--green  { border-left: 3px solid rgba(34,197,94,0.5); }
+  .border-left--cyan   { border-left: 3px solid rgba(6,182,212,0.5); }
+
+  /* ── Parallel label ── */
+  .parallel-label {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 0;
+  }
+
+  .parallel-label__line {
+    flex: 1;
+    height: 1px;
+  }
+
+  .parallel-label__line--fade-right {
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.2));
+  }
+
+  .parallel-label__line--fade-left {
+    background: linear-gradient(to left, transparent, rgba(255,255,255,0.2));
+  }
+
+  .parallel-label__text {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #9ca3af;
+    white-space: nowrap;
+  }
+
+  /* ── Lane groups ── */
+  .lanes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 700px) {
+    .lanes { grid-template-columns: 1fr; }
+  }
+
+  .lane {
+    border-radius: 20px;
+    padding: 24px;
+  }
+
+  .lane__title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .lane-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #d1d5db;
+  }
+
+  .lane-step:last-child { margin-bottom: 0; }
+
+  .lane-step__marker {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    vertical-align: middle;
+  }
+
+  .tag--ai     { background: rgba(139,92,246,0.2); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.3); }
+  .tag--human  { background: rgba(245,158,11,0.2); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
+  .tag--approved { background: rgba(34,197,94,0.2); color: #86efac; border: 1px solid rgba(34,197,94,0.3); }
+
+  /* ── Agent sections ── */
+  .agent-section { margin-bottom: 48px; }
+
+  .agent-card {
+    padding: 36px;
+  }
+
+  .agent-card__top {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .agent-card__number {
+    width: 44px; height: 44px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .agent-card__info h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .agent-card__info p {
+    font-size: 14px;
+    color: #9ca3af;
+    line-height: 1.6;
+  }
+
+  .agent-card__inspiration {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  /* Tool grid */
+  .tool-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 560px) {
+    .tool-grid { grid-template-columns: 1fr; }
+  }
+
+  .tool-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 16px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .tool-card:hover {
+    border-color: rgba(255,255,255,0.16);
+    box-shadow: 0 0 16px rgba(139,92,246,0.12);
+  }
+
+  .tool-card__icon {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  .tool-card__name {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .tool-card__desc {
+    font-size: 12px;
+    color: #9ca3af;
+    line-height: 1.5;
+  }
+
+  /* Flow chips */
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .flow__chip {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    white-space: nowrap;
+  }
+
+  .flow__arrow {
+    color: #6b7280;
+    font-size: 14px;
+  }
+
+  /* ── Loop section ── */
+  .loop-section {
+    text-align: center;
+    padding: 100px 0;
+  }
+
+  .loop-section__title {
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 800;
+    background: linear-gradient(135deg, #8b5cf6, #ec4899, #3b82f6);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-shift 5s ease infinite;
+    margin-bottom: 24px;
+  }
+
+  .loop-section__infinity {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: rgba(139,92,246,0.12);
+    border: 1px solid rgba(139,92,246,0.25);
+    box-shadow: 0 0 40px rgba(139,92,246,0.2);
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 30px rgba(139,92,246,0.2); }
+    50% { box-shadow: 0 0 50px rgba(139,92,246,0.35); }
+  }
+
+  /* ── Roadmap ── */
+  .roadmap-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .roadmap-header h2 {
+    font-size: clamp(24px, 3.5vw, 36px);
+    font-weight: 700;
+  }
+
+  .roadmap-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+  }
+
+  @media (max-width: 800px) {
+    .roadmap-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (max-width: 500px) {
+    .roadmap-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  .roadmap-card {
+    padding: 20px 16px;
+    text-align: center;
+  }
+
+  .roadmap-card__letter {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  .roadmap-card__title {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #d1d5db;
+    line-height: 1.4;
+  }
+
+  .roadmap-card__badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .roadmap-card__badge--green {
+    background: rgba(34,197,94,0.15);
+    color: #86efac;
+    border: 1px solid rgba(34,197,94,0.3);
+    box-shadow: 0 0 12px rgba(34,197,94,0.15);
+  }
+
+  .roadmap-card__badge--blue {
+    background: rgba(59,130,246,0.15);
+    color: #93c5fd;
+    border: 1px solid rgba(59,130,246,0.3);
+    box-shadow: 0 0 12px rgba(59,130,246,0.15);
+  }
+
+  .roadmap-card__badge--dim {
+    background: rgba(255,255,255,0.05);
+    color: #6b7280;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    padding: 48px 0;
+    font-size: 13px;
+    color: #4b5563;
+    letter-spacing: 1px;
+  }
+
+  /* ── Section header utility ── */
+  .section-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .section-header h2 {
+    font-size: clamp(24px, 3.5vw, 36px);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .section-header p {
+    color: #9ca3af;
+    font-size: 15px;
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* ── Merge label ── */
+  .merge-label {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 0;
+  }
+
+  .merge-label__line {
+    flex: 1;
+    height: 2px;
+    border-radius: 1px;
+  }
+
+  .merge-label__line--green-right {
+    background: linear-gradient(to right, transparent, rgba(34,197,94,0.5));
+  }
+
+  .merge-label__line--green-left {
+    background: linear-gradient(to left, transparent, rgba(34,197,94,0.5));
+  }
+
+  .merge-label__text {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #86efac;
+    white-space: nowrap;
+    text-shadow: 0 0 12px rgba(34,197,94,0.4);
+  }
+</style>
+</head>
+<body>
+
+<!-- Background orbs -->
+<div class="bg-orbs">
+  <div class="orb orb--purple"></div>
+  <div class="orb orb--blue"></div>
+  <div class="orb orb--pink"></div>
+  <div class="orb orb--cyan"></div>
+</div>
+
+<div class="page">
+
+  <!-- ══════════════════════════════════════════
+       HERO
+  ══════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="container">
+      <p class="hero__eyebrow">dua.com / Road to AI First</p>
+      <h1 class="hero__title">We built the machine that builds the product.</h1>
+      <p class="hero__sub">6 AI agents. One continuous loop. Every feature from idea to production &mdash; automatically.</p>
+
+      <div class="agent-badges">
+        <span class="badge badge--active"><span class="dot dot--purple"></span>Bogey</span>
+        <span class="badge badge--active"><span class="dot dot--pink"></span>Snoop</span>
+        <span class="badge badge--active"><span class="dot dot--pink"></span>Pixie</span>
+        <span class="badge badge--active"><span class="dot dot--amber"></span>Cyrus</span>
+        <span class="badge badge--standby"><span class="dot dot--green"></span>Docs Agent</span>
+        <span class="badge badge--standby"><span class="dot dot--cyan"></span>Support / Patch</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       PIPELINE OVERVIEW
+  ══════════════════════════════════════════ -->
+  <section id="pipeline">
+    <div class="container">
+
+      <div class="pipeline-header reveal">
+        <h2>One feature, start to finish</h2>
+        <p>"Add a dark mode toggle to the settings screen"</p>
+      </div>
+
+      <!-- Step 1 — Bogey -->
+      <div class="step-card reveal">
+        <div class="glass glow--purple">
+          <div class="step-card__header">
+            <div class="step-card__num step-card__num--purple">1</div>
+            <div class="step-card__title">Bogey &mdash; Task Creation</div>
+          </div>
+          <p class="step-card__desc">"Add dark mode toggle to settings screen" &rarr; creates 3 Linear tasks, scopes requirements, routes work to Design &amp; Dev lanes.</p>
+        </div>
+      </div>
+
+      <!-- Connector -->
+      <div class="connector"><div class="connector__line connector__line--purple"></div></div>
+
+      <!-- Parallel label -->
+      <div class="parallel-label reveal">
+        <div class="parallel-label__line parallel-label__line--fade-right"></div>
+        <span class="parallel-label__text">Design &amp; Dev lanes run in parallel</span>
+        <div class="parallel-label__line parallel-label__line--fade-left"></div>
+      </div>
+
+      <!-- Lanes -->
+      <div class="lanes reveal">
+
+        <!-- DESIGN LANE -->
+        <div class="lane glass border-left--pink glow--pink">
+          <div class="lane__title"><span class="dot dot--pink" style="width:8px;height:8px;border-radius:50%;display:inline-block;"></span> Design Lane</div>
+
+          <div class="lane-step">
+            <div class="lane-step__marker" style="background:#ec4899;"></div>
+            <div>Snoop researches dark mode patterns <span class="tag tag--ai">AI</span></div>
+          </div>
+          <div class="lane-step">
+            <div class="lane-step__marker" style="background:#ec4899;"></div>
+            <div>Creates a design proposal <span class="tag tag--ai">AI</span></div>
+          </div>
+          <div class="lane-step">
+            <div class="lane-step__marker" style="background:#f59e0b;"></div>
+            <div>Designer finalizes in Figma <span class="tag tag--human">Human</span></div>
+          </div>
+          <div class="lane-step">
+            <div class="lane-step__marker" style="background:#ec4899;"></div>
+            <div>Pixie builds interactive prototype <span class="tag tag--ai">AI</span></div>
+          </div>
+          <div class="lane-step">
+            <div class="lane-step__marker" style="background:#22c55e;"></div>
+            <div>Stakeholder green light <span class="tag tag--approved">Approved</span></div>
+          </div>
+          <div class="lane-step">
+            <div class="lane-step__marker" style="background:#ec4899;"></div>
+            <div>Figma MCP generates production components <span class="tag tag--ai">AI</span></div>
+          </div>
+        </div>
+
+        <!-- DEV LANE -->
+        <div class="lane glass border-left--amber glow--amber">
+          <div class="lane__title"><span class="dot dot--amber" style="width:8px;height:8px;border-radius:50%;display:inline-block;"></span> Dev Lane</div>
+
+          <div class="lane-step">
+            <div class="lane-step__marker" style="background:#f59e0b;"></div>
+            <div>GitNexus finds settings screen code <span class="tag tag--ai">AI</span></div>
+          </div>
+          <div class="lane-step">
+            <div class="lane-step__marker" style="background:#f59e0b;"></div>
+            <div>Reads MD files for context <span class="tag tag--ai">AI</span></div>
+          </div>
+          <div class="lane-step">
+            <div class="lane-step__marker" style="background:#f59e0b;"></div>
+            <div>Claude Code writes the toggle logic <span class="tag tag--ai">AI</span></div>
+          </div>
+          <div class="lane-step">
+            <div class="lane-step__marker" style="background:#f59e0b;"></div>
+            <div>Codex challenges the implementation <span class="tag tag--ai">AI</span></div>
+          </div>
+          <div class="lane-step">
+            <div class="lane-step__marker" style="background:#f59e0b;"></div>
+            <div>Mac Mini runs tests, opens PR <span class="tag tag--ai">AI</span></div>
+          </div>
+          <div class="lane-step">
+            <div class="lane-step__marker" style="background:#f59e0b;"></div>
+            <div>Code review &amp; merge <span class="tag tag--human">Human</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Merge label -->
+      <div class="merge-label reveal">
+        <div class="merge-label__line merge-label__line--green-right"></div>
+        <span class="merge-label__text">Both lanes merge</span>
+        <div class="merge-label__line merge-label__line--green-left"></div>
+      </div>
+
+      <!-- Step — Docs Agent -->
+      <div class="step-card reveal">
+        <div class="glass glow--green">
+          <div class="step-card__header">
+            <div class="step-card__num step-card__num--green">6</div>
+            <div class="step-card__title">Docs Agent &mdash; Ship It</div>
+          </div>
+          <p class="step-card__desc">CI runs, auto-generates documentation, cuts a release, records performance baseline. Feature is live.</p>
+        </div>
+      </div>
+
+      <div class="connector"><div class="connector__line connector__line--green"></div></div>
+
+      <!-- Step — Loop restart -->
+      <div class="step-card reveal">
+        <div class="glass glow--purple">
+          <div class="step-card__header">
+            <div class="step-card__num step-card__num--purple">&#x221E;</div>
+            <div class="step-card__title">Bogey picks up next ticket &mdash; loop restarts</div>
+          </div>
+          <p class="step-card__desc">The pipeline is continuous. As soon as one feature ships, the next begins.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       AGENT SECTIONS
+  ══════════════════════════════════════════ -->
+  <section id="agents">
+    <div class="container">
+
+      <div class="section-header reveal">
+        <h2>The Agents</h2>
+        <p>Six specialized AI agents, each with their own tools and responsibilities.</p>
+      </div>
+
+      <!-- 01 — Bogey -->
+      <div class="agent-section reveal">
+        <div class="agent-card glass border-left--purple glow--purple">
+          <div class="agent-card__top">
+            <div class="agent-card__number step-card__num--purple">01</div>
+            <div class="agent-card__info">
+              <h3>Bogey <span style="color:#9ca3af;font-weight:400;font-size:15px;">&mdash; Task Creator</span></h3>
+              <p>Takes raw ideas and product definitions, creates structured Linear tasks, and routes work to the correct lane &mdash; design or dev.</p>
+            </div>
+          </div>
+
+          <div class="tool-grid">
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F4CB;</div>
+              <div class="tool-card__name">Linear</div>
+              <div class="tool-card__desc">Task creation, prioritization, and routing to the right lane.</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F4D0;</div>
+              <div class="tool-card__name">Product Definition</div>
+              <div class="tool-card__desc">Scope, requirements, and acceptance criteria generation.</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F3A8;</div>
+              <div class="tool-card__name">Design Lane</div>
+              <div class="tool-card__desc">Routes to Snoop &amp; Pixie for research and prototyping.</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F4BB;</div>
+              <div class="tool-card__name">Dev Lane</div>
+              <div class="tool-card__desc">Routes to Developer Agent for implementation.</div>
+            </div>
+          </div>
+
+          <div class="flow">
+            <span class="flow__chip">Idea</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">Product Definition</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">Linear Tasks</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">Route</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 02 — Design Agents -->
+      <div class="agent-section reveal">
+        <div class="agent-card glass border-left--pink glow--pink">
+          <div class="agent-card__top">
+            <div class="agent-card__number" style="background:linear-gradient(135deg,#ec4899,#db2777);width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;">02</div>
+            <div class="agent-card__info">
+              <h3>Snoop &amp; Pixie <span style="color:#9ca3af;font-weight:400;font-size:15px;">&mdash; Design Agents</span></h3>
+              <p>End-to-end design pipeline: research, proposal, Figma mockups, interactive prototypes, stakeholder approval, and native code generation.</p>
+              <p class="agent-card__inspiration">Inspired by Uber's design spec automation</p>
+            </div>
+          </div>
+
+          <div class="tool-grid">
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F4A1;</div>
+              <div class="tool-card__name">Idea + Prototype</div>
+              <div class="tool-card__desc">Concept to validated design with research backing.</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x2705;</div>
+              <div class="tool-card__name">Green Light</div>
+              <div class="tool-card__desc">Stakeholder approval gate before development begins.</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F34E;</div>
+              <div class="tool-card__name">SwiftUI Components</div>
+              <div class="tool-card__desc">Production-ready iOS components from Figma designs.</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F916;</div>
+              <div class="tool-card__name">Kotlin Components</div>
+              <div class="tool-card__desc">Android component generation from approved designs.</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x269B;&#xFE0F;</div>
+              <div class="tool-card__name">React Components</div>
+              <div class="tool-card__desc">Web component generation with design tokens.</div>
+            </div>
+          </div>
+
+          <div class="flow">
+            <span class="flow__chip">Research</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">Proposal</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">Figma</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">Prototype</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">Approve</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">Code Gen</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 03 — Cyrus -->
+      <div class="agent-section reveal">
+        <div class="agent-card glass border-left--amber glow--amber">
+          <div class="agent-card__top">
+            <div class="agent-card__number" style="background:linear-gradient(135deg,#f59e0b,#d97706);width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;">03</div>
+            <div class="agent-card__info">
+              <h3>Cyrus <span style="color:#9ca3af;font-weight:400;font-size:15px;">&mdash; Developer</span></h3>
+              <p>The engineering backbone. Uses GitNexus for AI-powered code discovery, reads MD files for context, writes implementation with Claude Code, and validates with Codex &mdash; all on a dedicated Mac Mini.</p>
+              <p class="agent-card__inspiration">Inspired by Stripe's one-shot coding agents</p>
+            </div>
+          </div>
+
+          <div class="tool-grid">
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F50D;</div>
+              <div class="tool-card__name">GitNexus</div>
+              <div class="tool-card__desc">AI-powered code findability across all repositories.</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F4C4;</div>
+              <div class="tool-card__name">MD Files</div>
+              <div class="tool-card__desc">Project context, architecture decisions, and conventions.</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x2328;&#xFE0F;</div>
+              <div class="tool-card__name">Claude Code</div>
+              <div class="tool-card__desc">Writes the implementation &mdash; features, fixes, refactors.</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F9EA;</div>
+              <div class="tool-card__name">Codex</div>
+              <div class="tool-card__desc">Challenges and validates Claude's output for correctness.</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F5A5;&#xFE0F;</div>
+              <div class="tool-card__name">Mac Mini</div>
+              <div class="tool-card__desc">Properly PC &middot; Localghost &middot; Always on, always building.</div>
+            </div>
+          </div>
+
+          <div class="flow">
+            <span class="flow__chip">GitNexus</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">MD Context</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">Claude Code</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">Codex Review</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">Tests + PR</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 04 — Documentation Agent -->
+      <div class="agent-section reveal">
+        <div class="agent-card glass border-left--green glow--green">
+          <div class="agent-card__top">
+            <div class="agent-card__number" style="background:linear-gradient(135deg,#22c55e,#16a34a);width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;">04</div>
+            <div class="agent-card__info">
+              <h3>Documentation Agent <span style="color:#9ca3af;font-weight:400;font-size:15px;">&mdash; Ship &amp; Record</span></h3>
+              <p>Runs CI, auto-generates documentation, handles release automation, and records performance baselines. Then Bogey picks up the next ticket.</p>
+            </div>
+          </div>
+
+          <div class="tool-grid">
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x2699;&#xFE0F;</div>
+              <div class="tool-card__name">GitHub Actions</div>
+              <div class="tool-card__desc">CI/CD pipeline execution and monitoring.</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F4DA;</div>
+              <div class="tool-card__name">Auto Documentation</div>
+              <div class="tool-card__desc">Generates and updates docs from code changes.</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F680;</div>
+              <div class="tool-card__name">Release Automation</div>
+              <div class="tool-card__desc">Version bumps, changelogs, and deployment triggers.</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F4C8;</div>
+              <div class="tool-card__name">Performance Baseline</div>
+              <div class="tool-card__desc">Records metrics to detect regressions early.</div>
+            </div>
+          </div>
+
+          <div class="flow">
+            <span class="flow__chip">CI Tests</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">Auto Docs</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">Release</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">Perf Baseline</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">Next Ticket</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 05 — Data Agent -->
+      <div class="agent-section reveal">
+        <div class="agent-card glass border-left--cyan glow--cyan">
+          <div class="agent-card__top">
+            <div class="agent-card__number" style="background:linear-gradient(135deg,#06b6d4,#0891b2);width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;">05</div>
+            <div class="agent-card__info">
+              <h3>Data Agent <span style="color:#9ca3af;font-weight:400;font-size:15px;">&mdash; Standalone</span></h3>
+              <p>Not part of the main pipeline. Handles SQL queries, Tableau dashboards, data exploration, and business intelligence on demand.</p>
+            </div>
+          </div>
+
+          <div class="tool-grid">
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F5C3;&#xFE0F;</div>
+              <div class="tool-card__name">SQL Query Engine</div>
+              <div class="tool-card__desc">Natural language to SQL, query execution and results.</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F4CA;</div>
+              <div class="tool-card__name">Tableau Dashboards</div>
+              <div class="tool-card__desc">Automated dashboard creation and data visualization.</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F52C;</div>
+              <div class="tool-card__name">Data Exploration</div>
+              <div class="tool-card__desc">Anomaly detection, trend analysis, and data profiling.</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F4BC;</div>
+              <div class="tool-card__name">Business Intelligence</div>
+              <div class="tool-card__desc">KPI tracking, cohort analysis, and executive reporting.</div>
+            </div>
+          </div>
+
+          <div class="flow">
+            <span class="flow__chip">Question</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">SQL</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">Analysis</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">Dashboard</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 06 — Support Agent / Patch -->
+      <div class="agent-section reveal">
+        <div class="agent-card glass border-left--purple glow--purple">
+          <div class="agent-card__top">
+            <div class="agent-card__number step-card__num--purple" style="width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;">06</div>
+            <div class="agent-card__info">
+              <h3>Support / Patch <span style="color:#9ca3af;font-weight:400;font-size:15px;">&mdash; Standalone</span></h3>
+              <p>In-app AI chat for users. Handles FAQs, knowledge base lookups, premium human escalation, email fallback. Files bugs to Linear for Bogey. Manages changelogs and feature requests.</p>
+              <p class="agent-card__inspiration">Inspired by Klarna's AI support automation</p>
+            </div>
+          </div>
+
+          <div class="tool-grid">
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F4AC;</div>
+              <div class="tool-card__name">In-App AI Chat</div>
+              <div class="tool-card__desc">Claude-powered conversational support for users.</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F4D6;</div>
+              <div class="tool-card__name">FAQ / Knowledge Base</div>
+              <div class="tool-card__desc">Auto-maintained KB with semantic search.</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F464;</div>
+              <div class="tool-card__name">Human Escalation</div>
+              <div class="tool-card__desc">Premium tier escalation and email fallback.</div>
+            </div>
+            <div class="tool-card">
+              <div class="tool-card__icon">&#x1F41B;</div>
+              <div class="tool-card__name">Linear Bugs &rarr; Bogey</div>
+              <div class="tool-card__desc">Files bugs and feature requests back into the pipeline.</div>
+            </div>
+          </div>
+
+          <div class="flow">
+            <span class="flow__chip">User Message</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">AI Chat</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">Resolve / Escalate</span>
+            <span class="flow__arrow">&rarr;</span>
+            <span class="flow__chip">Bug &rarr; Bogey</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       LOOP
+  ══════════════════════════════════════════ -->
+  <section class="loop-section reveal">
+    <div class="container">
+      <h2 class="loop-section__title">And then it starts again.</h2>
+      <div class="loop-section__infinity">&#x221E;</div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       ROADMAP
+  ══════════════════════════════════════════ -->
+  <section id="roadmap">
+    <div class="container">
+
+      <div class="roadmap-header reveal">
+        <h2>Roadmap</h2>
+      </div>
+
+      <div class="roadmap-grid reveal">
+        <div class="roadmap-card glass">
+          <div class="roadmap-card__letter" style="color:#22c55e;">A</div>
+          <div class="roadmap-card__title">Foundation</div>
+          <span class="roadmap-card__badge roadmap-card__badge--green">In Progress</span>
+        </div>
+        <div class="roadmap-card glass">
+          <div class="roadmap-card__letter" style="color:#3b82f6;">B</div>
+          <div class="roadmap-card__title">iOS + Android + Migrate</div>
+          <span class="roadmap-card__badge roadmap-card__badge--blue">Up Next</span>
+        </div>
+        <div class="roadmap-card glass">
+          <div class="roadmap-card__letter" style="color:#6b7280;">C</div>
+          <div class="roadmap-card__title">Dev AI-First</div>
+          <span class="roadmap-card__badge roadmap-card__badge--dim">Planned</span>
+        </div>
+        <div class="roadmap-card glass">
+          <div class="roadmap-card__letter" style="color:#6b7280;">D</div>
+          <div class="roadmap-card__title">Design + Components</div>
+          <span class="roadmap-card__badge roadmap-card__badge--dim">Planned</span>
+        </div>
+        <div class="roadmap-card glass">
+          <div class="roadmap-card__letter" style="color:#6b7280;">E</div>
+          <div class="roadmap-card__title">QA + Docs + Release</div>
+          <span class="roadmap-card__badge roadmap-card__badge--dim">Planned</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════ -->
+  <footer class="footer">
+    dua.com &middot; ai-pipeline-v4 &middot; internal
+  </footer>
+
+</div>
+
+<script>
+  // Intersection Observer for fade-in-on-scroll
+  document.addEventListener('DOMContentLoaded', function () {
+    var reveals = document.querySelectorAll('.reveal');
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, {
+      threshold: 0.12,
+      rootMargin: '0px 0px -40px 0px'
+    });
+
+    reveals.forEach(function (el) {
+      observer.observe(el);
+    });
+  });
+</script>
+</body>
+</html>

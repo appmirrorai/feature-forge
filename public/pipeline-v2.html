@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>dua.com // ai-pipeline-v2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0a0a0a;
+      --bg-raised: #111111;
+      --bg-card: #0f0f0f;
+      --border: #333333;
+      --border-dim: #1a1a1a;
+      --green: #00ff88;
+      --green-dim: #00ff8833;
+      --green-mid: #00ff8866;
+      --amber: #ffb800;
+      --amber-dim: #ffb80033;
+      --cyan: #00d4ff;
+      --cyan-dim: #00d4ff22;
+      --text: #cccccc;
+      --text-dim: #666666;
+      --text-bright: #ffffff;
+      --red: #ff4444;
+      --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: var(--mono);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      touch-action: manipulation;
+    }
+
+    ::selection {
+      background: var(--green);
+      color: var(--bg);
+    }
+
+    a {
+      color: var(--cyan);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    a:hover {
+      color: var(--green);
+    }
+
+    /* -- SCROLLBAR -- */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+    /* -- CURSOR BLINK -- */
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      height: 1.1em;
+      background: var(--green);
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+      margin-left: 4px;
+    }
+
+    /* -- SCANLINE OVERLAY -- */
+    @keyframes scanline {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100vh); }
+    }
+
+    /* -- TOP BAR -- */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0 20px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-dim);
+    }
+
+    .topbar-left .path {
+      color: var(--green);
+    }
+
+    .topbar-left .sep {
+      color: var(--border);
+    }
+
+    .topbar-nav {
+      display: flex;
+      gap: 4px;
+    }
+
+    .topbar-nav a {
+      color: var(--text-dim);
+      padding: 4px 8px;
+      font-size: 11px;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+
+    .topbar-nav a:hover {
+      color: var(--green);
+      border-color: var(--border);
+    }
+
+    .topbar-nav a.active {
+      color: var(--green);
+      border-color: var(--green-dim);
+      background: var(--green-dim);
+    }
+
+    /* -- MAIN CONTAINER -- */
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* -- SECTION -- */
+    .section {
+      padding: 48px 0 32px;
+      border-bottom: 1px solid var(--border-dim);
+    }
+
+    .section:last-child {
+      border-bottom: none;
+    }
+
+    .section-header {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--green);
+      margin-bottom: 20px;
+      letter-spacing: 0.05em;
+    }
+
+    .section-header .num {
+      color: var(--text-dim);
+    }
+
+    /* -- HERO -- */
+    .hero {
+      padding: 60px 0 48px;
+      border-bottom: 1px solid var(--border-dim);
+    }
+
+    .hero-eyebrow {
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .hero-eyebrow span {
+      color: var(--cyan);
+    }
+
+    .hero-title {
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 700;
+      color: var(--text-bright);
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+
+    .hero-subtitle {
+      font-size: 14px;
+      color: var(--text-dim);
+      max-width: 600px;
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+
+    .hero-agents {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 16px 20px;
+      font-size: 12px;
+      line-height: 2;
+    }
+
+    .hero-agents .line {
+      display: flex;
+      gap: 8px;
+    }
+
+    .hero-agents .prompt {
+      color: var(--text-dim);
+      user-select: none;
+    }
+
+    .hero-agents .status-active {
+      color: var(--green);
+    }
+
+    .hero-agents .status-standby {
+      color: var(--amber);
+    }
+
+    .hero-agents .agent-name {
+      color: var(--text-bright);
+      font-weight: 500;
+    }
+
+    .hero-agents .agent-role {
+      color: var(--text-dim);
+    }
+
+    .hero-agents .sep {
+      color: var(--border);
+    }
+
+    /* -- PIPELINE -- */
+    .pipeline-example {
+      font-size: 12px;
+      color: var(--amber);
+      margin-bottom: 20px;
+      padding: 8px 12px;
+      border-left: 2px solid var(--amber);
+      background: var(--amber-dim);
+    }
+
+    .pipeline-example span {
+      color: var(--text-dim);
+    }
+
+    .pipeline-flow {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .pipeline-header-bar {
+      background: var(--bg-raised);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 16px;
+      font-size: 11px;
+      color: var(--text-dim);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .pipeline-header-bar .title {
+      color: var(--green);
+    }
+
+    .pipeline-body {
+      padding: 4px 0;
+    }
+
+    .pipe-line {
+      display: grid;
+      grid-template-columns: 36px 80px 1fr 80px;
+      padding: 4px 16px;
+      font-size: 12px;
+      align-items: baseline;
+      transition: background 0.1s;
+    }
+
+    .pipe-line:hover {
+      background: var(--green-dim);
+    }
+
+    .pipe-line .ln {
+      color: var(--text-dim);
+      text-align: right;
+      padding-right: 12px;
+      user-select: none;
+      font-size: 11px;
+    }
+
+    .pipe-line .ts {
+      color: var(--text-dim);
+      font-size: 11px;
+    }
+
+    .pipe-line .content {
+      color: var(--text);
+    }
+
+    .pipe-line .tag {
+      font-size: 10px;
+      padding: 1px 6px;
+      border: 1px solid;
+      text-align: center;
+      font-weight: 500;
+      display: inline-block;
+    }
+
+    .tag-ai {
+      color: var(--green);
+      border-color: var(--green-dim) !important;
+      background: var(--green-dim);
+    }
+
+    .tag-human {
+      color: var(--amber);
+      border-color: var(--amber-dim) !important;
+      background: var(--amber-dim);
+    }
+
+    .tag-approved {
+      color: var(--cyan);
+      border-color: var(--cyan-dim) !important;
+      background: var(--cyan-dim);
+    }
+
+    .pipe-group {
+      padding: 2px 16px 2px 52px;
+      font-size: 11px;
+      color: var(--text-dim);
+      border-top: 1px solid var(--border-dim);
+      border-bottom: 1px solid var(--border-dim);
+      margin: 4px 0;
+      background: var(--bg-raised);
+      letter-spacing: 0.05em;
+    }
+
+    .pipe-group .label {
+      color: var(--cyan);
+      font-weight: 600;
+    }
+
+    .pipe-merge {
+      padding: 6px 16px 6px 52px;
+      font-size: 11px;
+      color: var(--green);
+      border-top: 1px solid var(--green-dim);
+      border-bottom: 1px solid var(--green-dim);
+      margin: 4px 0;
+      background: var(--green-dim);
+      letter-spacing: 0.05em;
+    }
+
+    /* -- AGENT SECTIONS -- */
+    .agent-section {
+      padding: 40px 0 32px;
+      border-bottom: 1px solid var(--border-dim);
+    }
+
+    .agent-header {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .agent-num {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--border);
+    }
+
+    .agent-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .agent-role {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .agent-desc {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.7;
+      margin-bottom: 20px;
+      max-width: 700px;
+      padding-left: 2px;
+    }
+
+    .agent-inspired {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 20px;
+      padding-left: 2px;
+    }
+
+    .agent-inspired span {
+      color: var(--amber);
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .tool-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      font-size: 11px;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+
+    .tool-card:hover {
+      border-color: var(--green-dim);
+      background: var(--green-dim);
+    }
+
+    .tool-card .tool-icon {
+      color: var(--green);
+      margin-right: 6px;
+    }
+
+    .agent-flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+      font-size: 11px;
+    }
+
+    .flow-step {
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      color: var(--text);
+      background: var(--bg-card);
+    }
+
+    .flow-step.human {
+      border-color: var(--amber-dim);
+      color: var(--amber);
+    }
+
+    .flow-arrow {
+      color: var(--text-dim);
+      font-size: 10px;
+    }
+
+    /* -- LOOP SECTION -- */
+    .loop-section {
+      padding: 40px 0;
+      text-align: center;
+      border-bottom: 1px solid var(--border-dim);
+    }
+
+    .loop-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-bright);
+      margin-bottom: 12px;
+    }
+
+    .loop-desc {
+      font-size: 13px;
+      color: var(--text-dim);
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    .loop-ascii {
+      margin: 24px auto 0;
+      font-size: 12px;
+      color: var(--green);
+      line-height: 1.4;
+      white-space: pre;
+      display: inline-block;
+      text-align: left;
+    }
+
+    /* -- ROADMAP -- */
+    .roadmap-list {
+      list-style: none;
+    }
+
+    .roadmap-item {
+      display: grid;
+      grid-template-columns: 32px 1fr auto;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--border-dim);
+      margin-bottom: 4px;
+      background: var(--bg-card);
+      align-items: center;
+      font-size: 12px;
+    }
+
+    .roadmap-item:hover {
+      border-color: var(--border);
+    }
+
+    .roadmap-letter {
+      font-weight: 700;
+      color: var(--green);
+      font-size: 14px;
+    }
+
+    .roadmap-label {
+      color: var(--text);
+    }
+
+    .roadmap-status {
+      font-size: 10px;
+      padding: 2px 8px;
+      border: 1px solid;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .status-progress {
+      color: var(--green);
+      border-color: var(--green-dim);
+      background: var(--green-dim);
+    }
+
+    .status-next {
+      color: var(--amber);
+      border-color: var(--amber-dim);
+      background: var(--amber-dim);
+    }
+
+    .status-planned {
+      color: var(--text-dim);
+      border-color: var(--border);
+    }
+
+    /* -- FOOTER -- */
+    .footer {
+      padding: 24px 0;
+      font-size: 11px;
+      color: var(--text-dim);
+      text-align: center;
+      border-top: 1px solid var(--border-dim);
+    }
+
+    .footer .sep {
+      color: var(--border);
+      margin: 0 6px;
+    }
+
+    /* -- RESPONSIVE -- */
+    @media (max-width: 640px) {
+      .topbar-nav { display: none; }
+
+      .pipe-line {
+        grid-template-columns: 28px 1fr 60px;
+        font-size: 11px;
+      }
+
+      .pipe-line .ts { display: none; }
+
+      .tools-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      }
+
+      .hero { padding: 40px 0 32px; }
+
+      .agent-flow {
+        gap: 2px;
+        font-size: 10px;
+      }
+
+      .flow-step { padding: 3px 6px; }
+    }
+
+    /* -- FADE IN -- */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <nav class="topbar">
+    <div class="topbar-left">
+      <span class="path">~/dua.com</span>
+      <span class="sep">/</span>
+      <span>pipeline-v2.html</span>
+      <span class="sep">|</span>
+      <span>6 agents</span>
+      <span class="sep">|</span>
+      <span>1 loop</span>
+    </div>
+    <div class="topbar-nav">
+      <a href="#hero" data-nav>hero</a>
+      <a href="#pipeline" data-nav>pipeline</a>
+      <a href="#agents" data-nav>agents</a>
+      <a href="#loop" data-nav>loop</a>
+      <a href="#roadmap" data-nav>roadmap</a>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+      <div class="fade-in">
+        <div class="hero-eyebrow"><span>dua.com</span> // road-to-ai-first</div>
+        <h1 class="hero-title">We built the machine that builds the product.<span class="cursor"></span></h1>
+        <p class="hero-subtitle">6 AI agents. One continuous loop. Every feature from idea to production -- automatically.</p>
+      </div>
+
+      <div class="hero-agents fade-in">
+        <div class="line">
+          <span class="prompt">&gt;</span>
+          <span class="status-active">[active]</span>
+          <span class="agent-name">bogey</span>
+          <span class="sep">--</span>
+          <span class="agent-role">task creator</span>
+        </div>
+        <div class="line">
+          <span class="prompt">&gt;</span>
+          <span class="status-active">[active]</span>
+          <span class="agent-name">snoop &amp; pixie</span>
+          <span class="sep">--</span>
+          <span class="agent-role">design</span>
+        </div>
+        <div class="line">
+          <span class="prompt">&gt;</span>
+          <span class="status-active">[active]</span>
+          <span class="agent-name">cyrus</span>
+          <span class="sep">--</span>
+          <span class="agent-role">developer</span>
+        </div>
+        <div class="line">
+          <span class="prompt">&gt;</span>
+          <span class="status-active">[active]</span>
+          <span class="agent-name">docs</span>
+          <span class="sep">--</span>
+          <span class="agent-role">documentation</span>
+        </div>
+        <div class="line">
+          <span class="prompt">&gt;</span>
+          <span class="status-standby">[standby]</span>
+          <span class="agent-name">data</span>
+          <span class="sep">--</span>
+          <span class="agent-role">intelligence</span>
+        </div>
+        <div class="line">
+          <span class="prompt">&gt;</span>
+          <span class="status-standby">[standby]</span>
+          <span class="agent-name">patch</span>
+          <span class="sep">--</span>
+          <span class="agent-role">support</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- PIPELINE OVERVIEW -->
+    <section class="section" id="pipeline">
+      <div class="section-header fade-in"><span class="num">::</span> ONE FEATURE, START TO FINISH</div>
+
+      <div class="pipeline-example fade-in">
+        <span>&gt;&gt; example ::</span> "Add a dark mode toggle to the settings screen"
+      </div>
+
+      <div class="pipeline-flow fade-in">
+        <div class="pipeline-header-bar">
+          <span class="title">pipeline.log</span>
+          <span>stdout // realtime</span>
+        </div>
+        <div class="pipeline-body">
+
+          <!-- Step 1 -->
+          <div class="pipe-line">
+            <span class="ln">01</span>
+            <span class="ts">00:00:00</span>
+            <span class="content">bogey :: intake -- creates 3 Linear tasks, routes to lanes</span>
+            <span class="tag tag-ai">AI</span>
+          </div>
+
+          <!-- Parallel label -->
+          <div class="pipe-group">
+            <span class="label">[PARALLEL]</span> -- design &amp; dev lanes run simultaneously
+          </div>
+
+          <!-- DESIGN LANE -->
+          <div class="pipe-group">
+            <span class="label">DESIGN_LANE</span> :: begin
+          </div>
+
+          <div class="pipe-line">
+            <span class="ln">02</span>
+            <span class="ts">00:00:12</span>
+            <span class="content">snoop :: researches dark mode patterns, competitor audit</span>
+            <span class="tag tag-ai">AI</span>
+          </div>
+          <div class="pipe-line">
+            <span class="ln">03</span>
+            <span class="ts">00:01:44</span>
+            <span class="content">snoop :: creates design proposal with specs + rationale</span>
+            <span class="tag tag-ai">AI</span>
+          </div>
+          <div class="pipe-line">
+            <span class="ln">04</span>
+            <span class="ts">00:15:00</span>
+            <span class="content">designer :: finalizes mockups in Figma, applies brand tokens</span>
+            <span class="tag tag-human">HUMAN</span>
+          </div>
+          <div class="pipe-line">
+            <span class="ln">05</span>
+            <span class="ts">00:15:32</span>
+            <span class="content">pixie :: builds interactive prototype from Figma frames</span>
+            <span class="tag tag-ai">AI</span>
+          </div>
+          <div class="pipe-line">
+            <span class="ln">06</span>
+            <span class="ts">00:20:00</span>
+            <span class="content">stakeholder :: reviews prototype, gives green light</span>
+            <span class="tag tag-approved">APPROVED</span>
+          </div>
+          <div class="pipe-line">
+            <span class="ln">07</span>
+            <span class="ts">00:20:08</span>
+            <span class="content">figma-mcp :: generates SwiftUI + Kotlin + React components</span>
+            <span class="tag tag-ai">AI</span>
+          </div>
+
+          <div class="pipe-group">
+            <span class="label">DESIGN_LANE</span> :: end
+          </div>
+
+          <!-- DEV LANE -->
+          <div class="pipe-group">
+            <span class="label">DEV_LANE</span> :: begin
+          </div>
+
+          <div class="pipe-line">
+            <span class="ln">08</span>
+            <span class="ts">00:00:14</span>
+            <span class="content">gitnexus :: finds settings screen code, maps dependencies</span>
+            <span class="tag tag-ai">AI</span>
+          </div>
+          <div class="pipe-line">
+            <span class="ln">09</span>
+            <span class="ts">00:00:22</span>
+            <span class="content">context :: reads MD files for architecture + conventions</span>
+            <span class="tag tag-ai">AI</span>
+          </div>
+          <div class="pipe-line">
+            <span class="ln">10</span>
+            <span class="ts">00:01:58</span>
+            <span class="content">claude-code :: writes the toggle logic, state management</span>
+            <span class="tag tag-ai">AI</span>
+          </div>
+          <div class="pipe-line">
+            <span class="ln">11</span>
+            <span class="ts">00:03:10</span>
+            <span class="content">codex :: challenges implementation, suggests edge cases</span>
+            <span class="tag tag-ai">AI</span>
+          </div>
+          <div class="pipe-line">
+            <span class="ln">12</span>
+            <span class="ts">00:04:30</span>
+            <span class="content">mac-mini :: runs test suite, opens pull request</span>
+            <span class="tag tag-ai">AI</span>
+          </div>
+          <div class="pipe-line">
+            <span class="ln">13</span>
+            <span class="ts">00:30:00</span>
+            <span class="content">engineer :: code review, approval, merge to main</span>
+            <span class="tag tag-human">HUMAN</span>
+          </div>
+
+          <div class="pipe-group">
+            <span class="label">DEV_LANE</span> :: end
+          </div>
+
+          <!-- Merge -->
+          <div class="pipe-merge">
+            &gt;&gt; MERGE :: both lanes converge
+          </div>
+
+          <!-- Step 6 -->
+          <div class="pipe-line">
+            <span class="ln">14</span>
+            <span class="ts">00:31:00</span>
+            <span class="content">docs :: CI tests pass, auto docs, release, perf baseline</span>
+            <span class="tag tag-ai">AI</span>
+          </div>
+
+          <!-- Loop restart -->
+          <div class="pipe-line">
+            <span class="ln">15</span>
+            <span class="ts">00:32:00</span>
+            <span class="content">bogey :: picks up next ticket -- loop restarts</span>
+            <span class="tag tag-ai">AI</span>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- AGENTS -->
+    <section class="section" id="agents">
+      <div class="section-header fade-in"><span class="num">::</span> AGENT REGISTRY</div>
+
+      <!-- AGENT 01 :: BOGEY -->
+      <div class="agent-section fade-in" id="agent-01">
+        <div class="agent-header">
+          <span class="agent-num">01</span>
+          <span class="agent-name">BOGEY</span>
+          <span class="agent-role">// task creator</span>
+        </div>
+        <p class="agent-desc">
+          Takes raw ideas -- feature requests, bug reports, user feedback -- and transforms them into structured product definitions. Creates Linear tasks with full specs, acceptance criteria, and priority. Routes work to the design lane or dev lane depending on scope.
+        </p>
+        <div class="agent-inspired">
+          <span>&gt;</span> role :: orchestrator -- the central brain that keeps the pipeline fed
+        </div>
+        <div class="tools-grid">
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Linear</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Product Definition</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Design Lane Routing</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Dev Lane Routing</div>
+        </div>
+        <div class="agent-flow">
+          <span class="flow-step">idea intake</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step">product definition</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step">linear tasks</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step">route to lane</span>
+        </div>
+      </div>
+
+      <!-- AGENT 02 :: SNOOP & PIXIE -->
+      <div class="agent-section fade-in" id="agent-02">
+        <div class="agent-header">
+          <span class="agent-num">02</span>
+          <span class="agent-name">SNOOP &amp; PIXIE</span>
+          <span class="agent-role">// design agents</span>
+        </div>
+        <p class="agent-desc">
+          Snoop handles research -- competitor analysis, design patterns, UX best practices. Creates a design proposal with detailed specs. After the human designer finalizes in Figma, Pixie converts approved frames into an interactive prototype. Once stakeholders approve, Figma MCP generates native SwiftUI, Kotlin, and React components automatically.
+        </p>
+        <div class="agent-inspired">
+          <span>&gt;</span> inspired by :: how Uber automates design specs at scale
+        </div>
+        <div class="tools-grid">
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Idea + Prototype</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Green Light Approval</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> SwiftUI Components</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Kotlin Components</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> React Components</div>
+        </div>
+        <div class="agent-flow">
+          <span class="flow-step">research</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step">proposal</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step human">figma [human]</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step">prototype</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step human">approval [human]</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step">native components</span>
+        </div>
+      </div>
+
+      <!-- AGENT 03 :: CYRUS -->
+      <div class="agent-section fade-in" id="agent-03">
+        <div class="agent-header">
+          <span class="agent-num">03</span>
+          <span class="agent-name">CYRUS</span>
+          <span class="agent-role">// developer</span>
+        </div>
+        <p class="agent-desc">
+          Runs on a dedicated Mac Mini. GitNexus locates the relevant codebase files while MD context files provide architecture rules and conventions. Claude Code writes the implementation. Codex reviews and challenges the code, surfacing edge cases. The Mac Mini runs the full test suite and opens a PR for human review.
+        </p>
+        <div class="agent-inspired">
+          <span>&gt;</span> inspired by :: how Stripe builds one-shot coding agents
+        </div>
+        <div class="tools-grid">
+          <div class="tool-card"><span class="tool-icon">&gt;</span> GitNexus</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> MD Files</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Claude Code</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Codex</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Mac Mini</div>
+        </div>
+        <div class="agent-flow">
+          <span class="flow-step">gitnexus scan</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step">read context</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step">write code</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step">codex challenge</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step">test + PR</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step human">review [human]</span>
+        </div>
+      </div>
+
+      <!-- AGENT 04 :: DOCS -->
+      <div class="agent-section fade-in" id="agent-04">
+        <div class="agent-header">
+          <span class="agent-num">04</span>
+          <span class="agent-name">DOCS</span>
+          <span class="agent-role">// documentation agent</span>
+        </div>
+        <p class="agent-desc">
+          The closer. After both lanes merge, the Documentation Agent verifies CI tests pass, generates updated docs from the code changes, handles release automation, and captures performance baselines. Once complete, it closes the ticket -- and Bogey picks up the next one.
+        </p>
+        <div class="tools-grid">
+          <div class="tool-card"><span class="tool-icon">&gt;</span> GitHub Actions</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Auto Documentation</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Release Automation</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Performance Baseline</div>
+        </div>
+        <div class="agent-flow">
+          <span class="flow-step">CI tests</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step">auto docs</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step">release</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step">perf baseline</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step">close ticket</span>
+        </div>
+      </div>
+
+      <!-- AGENT 05 :: DATA -->
+      <div class="agent-section fade-in" id="agent-05">
+        <div class="agent-header">
+          <span class="agent-num">05</span>
+          <span class="agent-name">DATA</span>
+          <span class="agent-role">// intelligence [standalone]</span>
+        </div>
+        <p class="agent-desc">
+          Operates independently from the main pipeline loop. Handles SQL queries against production data, powers Tableau dashboards, enables ad-hoc data exploration, and feeds business intelligence insights back into product decisions. Currently on standby.
+        </p>
+        <div class="tools-grid">
+          <div class="tool-card"><span class="tool-icon">&gt;</span> SQL Query Engine</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Tableau Dashboards</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Data Exploration</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Business Intelligence</div>
+        </div>
+        <div class="agent-flow">
+          <span class="flow-step">sql queries</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step">dashboards</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step">exploration</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step">BI insights</span>
+        </div>
+      </div>
+
+      <!-- AGENT 06 :: PATCH -->
+      <div class="agent-section fade-in" id="agent-06">
+        <div class="agent-header">
+          <span class="agent-num">06</span>
+          <span class="agent-name">PATCH</span>
+          <span class="agent-role">// support agent [standalone]</span>
+        </div>
+        <p class="agent-desc">
+          The user-facing support layer. In-app AI chat powered by Claude handles the majority of requests. FAQ and knowledge base cover common questions. Premium users can escalate to a human. Email serves as a fallback channel. Bug reports flow back into Linear and route to Bogey. Public changelog and feature request intake close the feedback loop.
+        </p>
+        <div class="agent-inspired">
+          <span>&gt;</span> inspired by :: how Klarna automated 2/3 of support with AI
+        </div>
+        <div class="tools-grid">
+          <div class="tool-card"><span class="tool-icon">&gt;</span> In-App AI Chat</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Claude AI</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> FAQ / KB</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Premium Escalation</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Email Fallback</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Linear Bugs</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Public Changelog</div>
+          <div class="tool-card"><span class="tool-icon">&gt;</span> Feature Requests</div>
+        </div>
+        <div class="agent-flow">
+          <span class="flow-step">user query</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step">ai chat</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step">faq/kb</span>
+          <span class="flow-arrow">|</span>
+          <span class="flow-step human">human [premium]</span>
+          <span class="flow-arrow">|</span>
+          <span class="flow-step">email</span>
+          <span class="flow-arrow">&gt;&gt;</span>
+          <span class="flow-step">bugs to bogey</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOOP -->
+    <section class="loop-section" id="loop">
+      <div class="fade-in">
+        <div class="loop-title">And then it starts again.</div>
+        <p class="loop-desc">
+          The Documentation Agent closes the ticket. Bogey picks up the next one. The machine never stops.
+        </p>
+        <div class="loop-ascii">
+   [bogey] &gt;&gt; [design + dev] &gt;&gt; [merge] &gt;&gt; [docs]
+      ^                                           |
+      |___________________________________________|
+                     :: loop ::</div>
+      </div>
+    </section>
+
+    <!-- ROADMAP -->
+    <section class="section" id="roadmap">
+      <div class="section-header fade-in"><span class="num">::</span> ROADMAP</div>
+
+      <ul class="roadmap-list fade-in">
+        <li class="roadmap-item">
+          <span class="roadmap-letter">A</span>
+          <span class="roadmap-label">Foundation -- core pipeline, agent framework, Linear integration</span>
+          <span class="roadmap-status status-progress">IN PROGRESS</span>
+        </li>
+        <li class="roadmap-item">
+          <span class="roadmap-letter">B</span>
+          <span class="roadmap-label">iOS + Android + Migrate -- native apps, data migration tooling</span>
+          <span class="roadmap-status status-next">UP NEXT</span>
+        </li>
+        <li class="roadmap-item">
+          <span class="roadmap-letter">C</span>
+          <span class="roadmap-label">Dev AI-First -- full Cyrus autonomy, self-healing code</span>
+          <span class="roadmap-status status-planned">PLANNED</span>
+        </li>
+        <li class="roadmap-item">
+          <span class="roadmap-letter">D</span>
+          <span class="roadmap-label">Design + Components -- Figma MCP, cross-platform component gen</span>
+          <span class="roadmap-status status-planned">PLANNED</span>
+        </li>
+        <li class="roadmap-item">
+          <span class="roadmap-letter">E</span>
+          <span class="roadmap-label">QA + Docs + Release -- automated testing, docs, deploy pipeline</span>
+          <span class="roadmap-status status-planned">PLANNED</span>
+        </li>
+      </ul>
+    </section>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    dua.com<span class="sep">|</span>ai-pipeline-v2<span class="sep">|</span>internal
+  </div>
+
+  <script>
+    // -- SMOOTH SCROLL FOR NAV LINKS --
+    document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        var target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // -- INTERSECTION OBSERVER: ACTIVE NAV + FADE IN --
+    var navLinks = document.querySelectorAll('[data-nav]');
+    var sections = document.querySelectorAll('.hero, .section, .loop-section');
+    var fadeElements = document.querySelectorAll('.fade-in');
+
+    // Active nav highlighting
+    var navObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          var id = entry.target.getAttribute('id');
+          navLinks.forEach(function(link) {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + id) {
+              link.classList.add('active');
+            }
+          });
+        }
+      });
+    }, {
+      rootMargin: '-36px 0px -60% 0px',
+      threshold: 0
+    });
+
+    sections.forEach(function(section) {
+      navObserver.observe(section);
+    });
+
+    // Fade-in on scroll
+    var fadeObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, {
+      rootMargin: '0px 0px -40px 0px',
+      threshold: 0.1
+    });
+
+    fadeElements.forEach(function(el) {
+      fadeObserver.observe(el);
+    });
+  </script>
+
+</body>
+</html>

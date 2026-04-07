@@ -9,6 +9,9 @@ dist
 .env.local
 .env.*.local
 
+# Claude local settings (may contain secrets)
+.claude/settings.local.json
+
 # IDE
 .vscode
 .idea

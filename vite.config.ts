@@ -5,13 +5,13 @@ import { federation } from '@module-federation/vite';
 import { fileURLToPath } from 'url';
 
 // IMPORTANT: Change 'mytool' to your tool's unique name
-const TOOL_NAME = 'mytool';
+const TOOL_NAME = 'feature-forge';
 
 const mfVirtualDir = fileURLToPath(
   new URL('./node_modules/__mf__virtual', import.meta.url)
 );
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   css: {
     modules: {
       // Enable CSS Modules with scoped class names
@@ -26,37 +26,39 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    federation({
-      name: TOOL_NAME,
-      filename: 'remoteEntry.js',
-      exposes: {
-        './Tool': './src/Tool.tsx',
-      },
-      shared: {
-        // CRITICAL: All these must be singletons to share React context
-        // This prevents "Cannot read properties of null (reading 'useContext')" errors
-        react: {
-          singleton: true,
-          requiredVersion: '^19.0.0',
-          strictVersion: false,
-        },
-        'react-dom': {
-          singleton: true,
-          requiredVersion: '^19.0.0',
-          strictVersion: false,
-        },
-        // Required for React Query context to work across module boundaries
-        '@tanstack/react-query': {
-          singleton: true,
-          strictVersion: false,
-        },
-        // Required for useToolContext and all UI components to work
-        '@appmirror/ui-kit': {
-          singleton: true,
-          strictVersion: false,
-        },
-      },
-    }),
+    // Only enable Module Federation for production builds —
+    // in dev mode it breaks React's initialization order in shared modules
+    ...(command === 'build'
+      ? [
+          federation({
+            name: TOOL_NAME,
+            filename: 'remoteEntry.js',
+            exposes: {
+              './Tool': './src/Tool.tsx',
+            },
+            shared: {
+              react: {
+                singleton: true,
+                requiredVersion: '^19.0.0',
+                strictVersion: false,
+              },
+              'react-dom': {
+                singleton: true,
+                requiredVersion: '^19.0.0',
+                strictVersion: false,
+              },
+              '@tanstack/react-query': {
+                singleton: true,
+                strictVersion: false,
+              },
+              '@appmirror/ui-kit': {
+                singleton: true,
+                strictVersion: false,
+              },
+            },
+          }),
+        ]
+      : []),
   ],
   build: {
     target: 'esnext',
@@ -76,4 +78,4 @@ export default defineConfig({
     port: 4174,
     cors: true,
   },
-});
+}));

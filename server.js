@@ -837,6 +837,16 @@ app.post('/api/orchestrate/push-to-linear', async (req, res) => {
   }
 });
 
+// ── SPA catch-all ────────────────────────────────────────────────
+app.get('*', (req, res) => {
+  const indexPath = join(__dirname, 'dist', 'index.html');
+  if (existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(404).send('Not found');
+  }
+});
+
 // ── Start server ────────────────────────────────────────────────
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Tool server running on port ${PORT}`);

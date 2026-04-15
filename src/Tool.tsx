@@ -4,7 +4,10 @@ import type { Feature, FeatureTask, ViewRoute, OrchestrationPlan, PlanRole } fro
 import FeatureList from './components/FeatureList';
 import FeatureDetail from './components/FeatureDetail';
 import OrchestrationWizard from './components/orchestration/OrchestrationWizard';
+
 import SharedPlanView from './components/orchestration/SharedPlanView';
+
+import DesignAudit from './components/design-audit/DesignAudit';
 
 // ── Helpers ──────────────────────────────────────────────────────
 function generateId(): string {
@@ -188,6 +191,7 @@ export default function Tool() {
           features={features}
           onSelect={(id) => setRoute({ view: 'detail', featureId: id })}
           onOrchestrate={() => setRoute({ view: 'orchestrate' })}
+          onDesignAudit={() => setRoute({ view: 'design-audit' })}
         />
       )}
 
@@ -207,6 +211,7 @@ export default function Tool() {
           onCancel={() => setRoute({ view: 'list' })}
         />
       )}
+
 
       {route.view === 'plan' && (() => {
         const plan = plans.find(p => p.id === route.planId);
@@ -256,6 +261,13 @@ export default function Tool() {
           />
         );
       })()}
+
+      {route.view === 'design-audit' && (
+        <DesignAudit
+          apiBase={orchestrationApiBase}
+          onBack={() => setRoute({ view: 'list' })}
+        />
+      )}
 
       {route.view === 'detail' && (() => {
         const feature = features.find(f => f.id === route.featureId);

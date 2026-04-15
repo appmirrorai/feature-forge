@@ -174,4 +174,7 @@ export type ViewRoute =
   | { view: 'tasks'; featureId: string }
   | { view: 'orchestrate'; featureId?: string }
   | { view: 'orchestrate-review'; planId: string }
+
   | { view: 'plan'; planId: string; role?: import('./orchestration').PlanRole };
+
+  | { view: 'design-audit' };
